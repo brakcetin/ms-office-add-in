@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Word Add-in</title>
+
+  <!-- Office JavaScript API -->
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+
+  <!-- Custom CSS -->
+  <link href="taskpane.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body class="ms-font-m ms-Fabric">
+  <!-- Sideload message for development -->
+  <section id="sideload-msg" class="ms-welcome__main">
+    <h2 class="ms-font-xl">Please sideload your add-in to see app body.</h2>
+  </section>
+
+  <!-- Main app body -->
+  <main id="app-body" class="ms-welcome__main" style="display: none;">
+    <h1 class="ms-font-su">My Word Add-in</h1>
+    <p class="ms-font-l">
+      Please use the "Save Document" button below to save your document and insert "Burak" at the top.
+    </p>
+    <button id="customSaveButton" class="ms-Button ms-Button--primary">
+      <span class="ms-Button-label">Save Document</span>
+    </button>
+    <button id="inspectCustomPropertiesButton" class="ms-Button ms-Button--primary">
+      <span class="ms-Button-label">Inspect Custom Properties</span>
+    </button>
+    <div id="notification-message" class="ms-font-m"></div>
+  </main>
+
+  <!-- Custom JavaScript -->
+  <script src="taskpane.js?v=5"></script>
+</body>
+
+</html>
