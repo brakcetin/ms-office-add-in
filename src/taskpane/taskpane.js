@@ -99,6 +99,7 @@ function inspectCustomProperties() {  //  This function reads the Custom Propert
       if (customProperties.items.length === 0) {  //  Check to notify the user when Custom Properties is not available.
         console.log("No custom properties found.");
       }else{
+        console.log(`Found ${customProperties.items.length} custom properties:`);
         //  Iterate through the custom properties
         customProperties.items.forEach(function (property) {  //  It loops each custom property and prints the key and value pairs to the console.
           console.log(`Name: ${property.key}, Value: ${property.value}`);
@@ -110,6 +111,97 @@ function inspectCustomProperties() {  //  This function reads the Custom Propert
   .catch(function (error) { //  If any error occurs, it captures the error and prints it to the console.
     console.error("Error:", error);
     showNotification("An error occurred while retrieving custom properties.");
+  });
+}
+
+// Add a custom property
+// key: name of custom property
+// value: the value assign to the property
+function addCustomProperty(key, value) {
+  Word.run(function (context) {
+    const customProperties = context.document.properties.customProperties;
+    customProperties.add(key, value); // add new property
+
+    return context.sync().then(function () {  // allow changes to be aplied to the Word document
+      console.log(`Added custom property: { Key: ${key}, Value: ${value} }`);
+      showNotification("Custom property added successfully.");
+    });
+  }).catch(function (error) {
+    console.error("Error adding custom property:", error);
+    showNotification("An error occurred while adding the custom property.");
+  });
+}
+
+// Delete a custom property
+// key: name of custom property
+function deleteCustomProperty(key) {
+  Word.run(function (context) {
+    const customProperties = context.document.properties.customProperties;
+    customProperties.load("items");
+
+    return context.sync().then(function () {
+      const propertyToDelete = customProperties.items.find(p => p.key === key);
+      if (propertyToDelete) {
+        propertyToDelete.delete();
+        return context.sync().then(function () {
+          console.log(`Deleted custom property: ${key}`);
+          showNotification("Custom property deleted successfully.");
+        });
+      } else {
+        console.log(`Custom property not found: ${key}`);
+        showNotification("Custom property not found.");
+      }
+    });
+  }).catch(function (error) {
+    console.error("Error deleting custom property:", error);
+    showNotification("An error occurred while deleting the custom property.");
+  });
+}
+
+// Update a custom property (delete and re-add with a new value)
+function updateCustomProperty(key, value) {
+  Word.run(function (context) {
+    const customProperties = context.document.properties.customProperties;
+    customProperties.load("items");
+
+    return context.sync().then(function () {
+      const propertyToUpdate = customProperties.items.find(p => p.key === key);
+      // Searches for the property in the collection whose key is equal to the given key.
+      // p.key === key: The key value of each property is compared to the key parameter given to the function.
+      // propertyToDelete: Represents the custom property to delete. Returns undefined if not found.
+
+      if (propertyToUpdate) {
+        propertyToUpdate.delete(); // delete the property
+        customProperties.add(key, value);
+        return context.sync().then(function () {
+          console.log(`Updated custom property: { Key: ${key}, Value: ${value} }`);
+          showNotification("Custom property updated successfully.");
+        });
+      } else {
+        console.log(`Custom property not found for updating: ${key}`);
+        showNotification("Custom property not found for updating.");
+      }
+    });
+  }).catch(function (error) {
+    console.error("Error updating custom property:", error);
+    showNotification("An error occurred while updating the custom property.");
+  });
+}
+
+// Retrieve the full document text
+function getFullDocumentText() {
+  Word.run(function (context) {
+    const body = context.document.body;
+    body.load("text"); // Loads the entire text of the document body (the text property) into the binding. This allows the body text to be used later.
+
+    return context.sync().then(function () {
+      console.log("Full document text:");
+      console.log(body.text); // Prints all text in the document body to the console.
+      showNotification("Full document text retrieved. Check the console.");
+    });
+  }).catch(function (error) {
+    console.error("Error retrieving document text:", error);
+    showNotification("An error occurred while retrieving the document text.");
   });
 }
 
