@@ -141,8 +141,12 @@ function deleteCustomProperty(key) {
 
     return context.sync().then(function () {
       const propertyToDelete = customProperties.items.find(p => p.key === key);
+      // Searches for the property in the collection whose key is equal to the given key.
+      // p.key === key: The key value of each property is compared to the key parameter given to the function.
+      // propertyToDelete: Represents the custom property to delete. Returns undefined if not found.
+
       if (propertyToDelete) {
-        propertyToDelete.delete();
+        propertyToDelete.delete();  // delete the property
         return context.sync().then(function () {
           console.log(`Deleted custom property: ${key}`);
           showNotification("Custom property deleted successfully.");
@@ -168,11 +172,11 @@ function updateCustomProperty(key, value) {
       const propertyToUpdate = customProperties.items.find(p => p.key === key);
       // Searches for the property in the collection whose key is equal to the given key.
       // p.key === key: The key value of each property is compared to the key parameter given to the function.
-      // propertyToDelete: Represents the custom property to delete. Returns undefined if not found.
+      // propertyToUpdate: Represents the custom property to update. Returns undefined if not found.
 
       if (propertyToUpdate) {
         propertyToUpdate.delete(); // delete the property
-        customProperties.add(key, value);
+        customProperties.add(key, value); // update the property
         return context.sync().then(function () {
           console.log(`Updated custom property: { Key: ${key}, Value: ${value} }`);
           showNotification("Custom property updated successfully.");
