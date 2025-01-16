@@ -240,3 +240,43 @@ window.debugCustomProperties = function () {  //  Adds the function to the windo
     console.error("Error while inspecting custom properties:", error);
   });
 };
+
+function pushToCustomProperties(key, value) {
+  Word.run(function (context) {
+      const customProperties = context  .document.properties.customProperties;
+      customProperties.load("items"); // Mevcut öğeleri yükler
+
+      return context.sync().then(function () {
+          // Yeni öğeyi m__items dizisine ekle
+          customProperties.m__items.push({ key: key, value: value });
+
+          console.log(`Pushed to m__items: { Key: ${key}, Value: ${value} }`);
+          console.log("Updated m__items:", customProperties.m__items);
+      });
+  }).catch(function (error) {
+      console.error("Error pushing to m__items:", error);
+  });
+}
+
+
+function popFromCustomProperties() {
+  Word.run(function (context) {
+      const customProperties = context.document.properties.customProperties;
+      customProperties.load("items"); // Mevcut öğeleri yükler
+
+      return context.sync().then(function () {
+          if (customProperties.m__items.length === 0) {
+              console.log("No items to pop in m__items.");
+              return;
+          }
+
+          // Son öğeyi kaldır
+          const removedItem = customProperties.m__items.pop();
+
+          console.log("Popped from m__items:", removedItem);
+          console.log("Updated m__items:", customProperties.m__items);
+      });
+  }).catch(function (error) {
+      console.error("Error popping from m__items:", error);
+  });
+}
