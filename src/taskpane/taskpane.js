@@ -63,11 +63,11 @@ function customSave() {
 */
 
 function customSave() {
-  const dialogUrl = "https://localhost:3000/dialog.html?v=16";
+  const dialogUrl = "https://localhost:3000/dialog.html?v=17";
 
   Office.context.ui.displayDialogAsync(
     dialogUrl,
-    { height: 40, width: 30 }, // Set size of the dialog (percentage of screen)
+    { height: 40, width: 60, displayInIframe: true }, // Set size of the dialog (percentage of screen) and set the dialog to open in an iframe
     function(asyncResult){
       if(asyncResult.status === Office.AsyncResultStatus.Failed){
         console.error("Error opening dialog:", asyncResult.error.message);
