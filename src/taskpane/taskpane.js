@@ -25,7 +25,7 @@ Office.onReady((info) => {  //  This mechanism checks the platform on which the 
     document.getElementById("inspectCustomPropertiesButton").onclick = inspectCustomProperties; // When the button is clicked, the inspectCustomProperties function is called.
   }
 });
-
+/*
 function customSave() {
   Word.run(function (context) {
     // Get the document body
@@ -46,7 +46,7 @@ function customSave() {
       // Save the document
       /*return context.sync().then(function () {
         return context.document.save();
-      });*/
+      });*//*
       return context.document.save();
     })
     //.then(context.sync)
@@ -60,7 +60,71 @@ function customSave() {
     showNotification("An error occurred while saving the document.");
   });
 }
+*/
 
+function customSave() {
+  const dialogUrl = "https://localhost:3000/dialog.html?v=16";
+
+  Office.context.ui.displayDialogAsync(
+    dialogUrl,
+    { height: 40, width: 30 }, // Set size of the dialog (percentage of screen)
+    function(asyncResult){
+      if(asyncResult.status === Office.AsyncResultStatus.Failed){
+        console.error("Error opening dialog:", asyncResult.error.message);
+        showNotification("Failed to open the dialog.");
+      }else{
+        const dialog = asyncResult.value;
+
+        // Listen for messages from the dialog
+        dialog.addEventHandler(Office.EventType.DialogMessageReceived, function(message){
+          console.log("Message received from dialog:", message.message);
+
+          if (message.message === "closeDialogAndSave") {
+            dialog.close(); // Close the dialog
+          }
+
+          Word.run(function (context) {
+            // Get the document body
+            const body = context.document.body;
+            debugger;
+            // Get the first paragraph to check if "Name" is already inserted
+            //var firstParagraph = body.paragraphs.getFirst();
+            const firstParagraph = body.paragraphs.getFirst();
+            firstParagraph.load("text");
+        
+            return context.sync().then(function () {
+              // Check if "Name" is at the top
+              if (!firstParagraph.text.startsWith("Burak")) {
+                // Insert "Name" at the top of the document
+                body.insertText("Burak\n", Word.InsertLocation.start);
+              }
+        
+              // Save the document
+              /*return context.sync().then(function () {
+                return context.document.save();
+              });*/
+              return context.document.save();
+            })
+            //.then(context.sync)
+            .then(function () {
+              // Display a success message
+              showNotification("Document saved with 'Burak' at the top.");
+            });
+          })
+          .catch(function (error) {
+            console.error("Error:", error);
+            showNotification("An error occurred while saving the document.");
+          });
+        });
+
+        // Handle dialog closed event
+        dialog.addEventHandler(Office.EventType.DialogEventReceived, function () {
+          console.log("Dialog was closed.");
+        });
+      }
+    }
+  );
+}
 
 function showNotification(message) {
   const notification = document.getElementById("notification-message");
@@ -193,6 +257,7 @@ function updateCustomProperty(key, value) {
 }
 
 // Retrieve the full document text
+/*
 function getFullDocumentText() {
   Word.run(function (context) {
     const body = context.document.body;
@@ -202,6 +267,27 @@ function getFullDocumentText() {
       console.log("Full document text:");
       console.log(body.text); // Prints all text in the document body to the console.
       showNotification("Full document text retrieved. Check the console.");
+    });
+  }).catch(function (error) {
+    console.error("Error retrieving document text:", error);
+    showNotification("An error occurred while retrieving the document text.");
+  });
+}
+*/
+
+// Retrieve the full document text
+function getFullDocumentText() {
+  Word.run(function (context) {
+    const paragraphs = context.document.body.paragraphs;
+    paragraphs.load("items"); // Load all paragraphs in the document
+
+    return context.sync().then(function () {
+      // Combine paragraphs with line breaks to simulate a TXT format
+      const txtFormat = paragraphs.items.map(p => p.text).join("\n");
+
+      console.log("Full document text in TXT format:");
+      console.log(txtFormat); // Print the text with line breaks preserved
+      showNotification("Full document text retrieved in TXT format. Check the console.");
     });
   }).catch(function (error) {
     console.error("Error retrieving document text:", error);
